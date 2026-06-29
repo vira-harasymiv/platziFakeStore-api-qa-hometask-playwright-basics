@@ -1,10 +1,13 @@
 import { test, expect } from "@playwright/test";
 
+function getRandomNumber() {
+  return Math.floor(Math.random() * 100000);
+}
+
 //Get a single product by ID
 test("get product by id - should be succeful", async ({ request }) => {
   // Arrange — підготовка даних
-  const radomNumber = Math.floor(Math.random() * 1_000_000);
-  const uniqueTitle = "New Product" + radomNumber;
+  const uniqueTitle = "New Product" + getRandomNumber();
   const responseCreate = await request.post("api/v1/products/", {
     data: {
       title: uniqueTitle,
@@ -28,18 +31,18 @@ test("get product by id - should be succeful", async ({ request }) => {
   expect(responseGet).toBeOK();
   expect(responseGet.status()).toBe(200);
   expect(responseGet.statusText()).toBe("OK");
-  expect(jsonGet).toHaveProperty("title", uniqueTitle);
-  expect(jsonGet).toHaveProperty("price", 10);
-  expect(jsonGet).toHaveProperty("description", "A description");
-  expect(jsonGet).toHaveProperty("images", ["https://placehold.co/600x400"]);
-  expect(jsonGet).toHaveProperty("category.id", 1);
+  expect(jsonGet).toMatchObject(jsonCreate);
+  // expect(jsonGet).toHaveProperty("title", uniqueTitle);
+  // expect(jsonGet).toHaveProperty("price", 10);
+  // expect(jsonGet).toHaveProperty("description", "A description");
+  // expect(jsonGet).toHaveProperty("images", ["https://placehold.co/600x400"]);
+  // expect(jsonGet).toHaveProperty("category.id", 1);
 });
 
 //Get a single product by slug
 test("get product by slug - should be succeful", async ({ request }) => {
   //Arrange
-  const radomNumber = Math.floor(Math.random() * 1_000_000);
-  const uniqueTitle = "A new Product" + radomNumber;
+  const uniqueTitle = "A new Product" + getRandomNumber();
   const responseCreate = await request.post("api/v1/products/", {
     data: {
       title: uniqueTitle,
@@ -66,11 +69,12 @@ test("get product by slug - should be succeful", async ({ request }) => {
   expect(responseGet).toBeOK();
   expect(responseGet.status()).toBe(200);
   expect(responseGet.statusText()).toBe("OK");
-  expect(jsonGet).toHaveProperty("title", uniqueTitle);
-  expect(jsonGet).toHaveProperty("price", 10);
-  expect(jsonGet).toHaveProperty("description", "A description");
-  expect(jsonGet).toHaveProperty("images", ["https://placehold.co/600x400"]);
-  expect(jsonGet).toHaveProperty("category.id", 1);
+  expect(jsonGet).toMatchObject(jsonCreate);
+  // expect(jsonGet).toHaveProperty("title", uniqueTitle);
+  // expect(jsonGet).toHaveProperty("price", 10);
+  // expect(jsonGet).toHaveProperty("description", "A description");
+  // expect(jsonGet).toHaveProperty("images", ["https://placehold.co/600x400"]);
+  // expect(jsonGet).toHaveProperty("category.id", 1);
 });
 
 //Pagination
@@ -92,8 +96,7 @@ test("pagination - it should be successful", async ({ request }) => {
 //Create a product
 test("create a product - should be successful", async ({ request }) => {
   //Arrange
-  const radomNumber = Math.floor(Math.random() * 1_000_000);
-  const uniqueTitle = "New Product" + radomNumber;
+  const uniqueTitle = "New created Product" + getRandomNumber();
 
   //Act
   const responseCreate = await request.post("/api/v1/products/", {
@@ -118,20 +121,20 @@ test("create a product - should be successful", async ({ request }) => {
     failOnStatusCode: true,
   });
   const jsonGet = await responseGet.json();
-  expect(jsonGet).toHaveProperty("title", uniqueTitle);
-  expect(jsonGet).toHaveProperty("price", 10);
-  expect(jsonGet).toHaveProperty("description", "A description");
-  expect(jsonGet).toHaveProperty("images", ["https://placehold.co/600x400"]);
-  expect(jsonGet).toHaveProperty("category.id", 1);
+  expect(jsonGet).toMatchObject(jsonCreate);
+  // expect(jsonGet).toHaveProperty("title", uniqueTitle);
+  // expect(jsonGet).toHaveProperty("price", 10);
+  // expect(jsonGet).toHaveProperty("description", "A description");
+  // expect(jsonGet).toHaveProperty("images", ["https://placehold.co/600x400"]);
+  // expect(jsonGet).toHaveProperty("category.id", 1);
 });
 
 //Update product
 test("update product - should be successful", async ({ request }) => {
   //Arrange
-  const radomNumber = Math.floor(Math.random() * 1_000_000);
   const response = await request.post("/api/v1/products/", {
     data: {
-      title: "New Product" + radomNumber,
+      title: "New Product to update" + getRandomNumber(),
       price: 10,
       description: "A description",
       categoryId: 1,
@@ -142,12 +145,11 @@ test("update product - should be successful", async ({ request }) => {
 
   const jsonCreate = await response.json();
   const productId = jsonCreate.id;
-  const uniqueTitle = "Updated Product" + radomNumber;
 
   //Act
   const updatedProduct = await request.put(`/api/v1/products/${productId}`, {
     data: {
-      title: "Updated Product" + radomNumber,
+      title: "Updated Product" + getRandomNumber(),
       price: 200,
       description: "A description",
       categoryId: 1,
@@ -156,6 +158,7 @@ test("update product - should be successful", async ({ request }) => {
   });
 
   //Expect
+  const updatedJson = await updatedProduct.json();
   expect(updatedProduct).toBeOK();
   expect(updatedProduct.status()).toBe(200);
   expect(updatedProduct.statusText()).toBe("OK");
@@ -163,21 +166,21 @@ test("update product - should be successful", async ({ request }) => {
     failOnStatusCode: true,
   });
   const jsonGet = await responseGet.json();
+  expect(jsonGet).toMatchObject(updatedJson);
 
-  expect(jsonGet).toHaveProperty("title", uniqueTitle);
-  expect(jsonGet).toHaveProperty("price", 200);
-  expect(jsonGet).toHaveProperty("description", "A description");
-  expect(jsonGet).toHaveProperty("images", ["https://placehold.co/600x400"]);
-  expect(jsonGet).toHaveProperty("category.id", 1);
+  // expect(jsonGet).toHaveProperty("title", uniqueTitle);
+  // expect(jsonGet).toHaveProperty("price", 200);
+  // expect(jsonGet).toHaveProperty("description", "A description");
+  // expect(jsonGet).toHaveProperty("images", ["https://placehold.co/600x400"]);
+  // expect(jsonGet).toHaveProperty("category.id", 1);
 });
 
 //Delete product
 test("delete product - should be successful", async ({ request }) => {
   //Arrange
-  const radomNumber = Math.floor(Math.random() * 1_000_000);
   const response = await request.post("/api/v1/products/", {
     data: {
-      title: "New Product" + radomNumber,
+      title: "New Product" + getRandomNumber(),
       price: 10,
       description: "A description",
       categoryId: 1,
@@ -243,10 +246,9 @@ test("Get products related by id - should be successful", async ({
 test("Get products related by slug - should be successful", async ({
   request,
 }) => {
-  const radomNumber = Math.floor(Math.random() * 1_000_000);
   const response = await request.post("/api/v1/products/", {
     data: {
-      title: "New Product" + radomNumber,
+      title: "New Product" + getRandomNumber(),
       price: 10,
       description: "A description",
       categoryId: 1,
