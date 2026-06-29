@@ -1,16 +1,6 @@
 import { test, expect } from "@playwright/test";
 
 //Get a single product by ID
-//Get a single product by slug
-//Create a product
-//Update a product
-//Delete a product
-//Pagination
-//Get products related by id -
-//Get products related by slug -
-//test headers -
-
-//Get a single product by ID
 test("get product by id - should be succeful", async ({ request }) => {
   //Arrange
   const radomNumber = Math.floor(Math.random() * 1_000_000);
