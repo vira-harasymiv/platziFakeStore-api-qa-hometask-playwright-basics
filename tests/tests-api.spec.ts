@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 
 //Get a single product by ID
 test("get product by id - should be succeful", async ({ request }) => {
-  //Arrange
+  // Arrange — підготовка даних
   const radomNumber = Math.floor(Math.random() * 1_000_000);
   const uniqueTitle = "New Product" + radomNumber;
   const responseCreate = await request.post("api/v1/products/", {
@@ -18,13 +18,13 @@ test("get product by id - should be succeful", async ({ request }) => {
   let jsonCreate = await responseCreate.json();
   const productId = jsonCreate.id;
 
-  //Act
+  // Act — головна дія, яку перевіряємо
   const responseGet = await request.get(`/api/v1/products/${productId}`, {
     failOnStatusCode: true,
   });
   const jsonGet = await responseGet.json();
 
-  //Assert
+  // Assert — перевірка, що дія відпрацювала як треба
   expect(responseGet).toBeOK();
   expect(responseGet.status()).toBe(200);
   expect(responseGet.statusText()).toBe("OK");
