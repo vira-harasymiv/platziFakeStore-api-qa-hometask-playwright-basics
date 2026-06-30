@@ -26,12 +26,16 @@ test("get product by id - should be succeful", async ({ request }) => {
     failOnStatusCode: true,
   });
   const jsonGet = await responseGet.json();
+  const headers = responseGet.headers();
 
   // Assert — перевірка, що дія відпрацювала як треба
   expect(responseGet).toBeOK();
   expect(responseGet.status()).toBe(200);
   expect(responseGet.statusText()).toBe("OK");
   expect(jsonGet).toMatchObject(jsonCreate);
+  expect(headers["content-type"]).toContain("application/json");
+  expect(headers["access-control-allow-origin"]).toBe("*");
+  expect(headers).toHaveProperty("date");
   // expect(jsonGet).toHaveProperty("title", uniqueTitle);
   // expect(jsonGet).toHaveProperty("price", 10);
   // expect(jsonGet).toHaveProperty("description", "A description");
@@ -64,12 +68,16 @@ test("get product by slug - should be succeful", async ({ request }) => {
     },
   );
   const jsonGet = await responseGet.json();
+  const headers = responseGet.headers();
 
   //Assert
   expect(responseGet).toBeOK();
   expect(responseGet.status()).toBe(200);
   expect(responseGet.statusText()).toBe("OK");
   expect(jsonGet).toMatchObject(jsonCreate);
+  expect(headers["access-control-allow-origin"]).toBe("*");
+  expect(headers["content-type"]).toContain("application/json");
+  expect(headers).toHaveProperty("date");
   // expect(jsonGet).toHaveProperty("title", uniqueTitle);
   // expect(jsonGet).toHaveProperty("price", 10);
   // expect(jsonGet).toHaveProperty("description", "A description");
@@ -91,6 +99,10 @@ test("pagination - it should be successful", async ({ request }) => {
   expect(response).toBeOK();
   expect(response.status()).toBe(200);
   expect(response.statusText()).toBe("OK");
+  const headers = response.headers();
+  expect(headers["access-control-allow-origin"]).toBe("*");
+  expect(headers["content-type"]).toContain("application/json");
+  expect(headers).toHaveProperty("date");
 });
 
 //Create a product
@@ -122,6 +134,10 @@ test("create a product - should be successful", async ({ request }) => {
   });
   const jsonGet = await responseGet.json();
   expect(jsonGet).toMatchObject(jsonCreate);
+  const headers = responseCreate.headers();
+  expect(headers["access-control-allow-origin"]).toBe("*");
+  expect(headers["content-type"]).toContain("application/json");
+  expect(headers).toHaveProperty("date");
   // expect(jsonGet).toHaveProperty("title", uniqueTitle);
   // expect(jsonGet).toHaveProperty("price", 10);
   // expect(jsonGet).toHaveProperty("description", "A description");
@@ -167,6 +183,10 @@ test("update product - should be successful", async ({ request }) => {
   });
   const jsonGet = await responseGet.json();
   expect(jsonGet).toMatchObject(updatedJson);
+  const headers = updatedProduct.headers();
+  expect(headers["access-control-allow-origin"]).toBe("*");
+  expect(headers["content-type"]).toContain("application/json");
+  expect(headers).toHaveProperty("date");
 
   // expect(jsonGet).toHaveProperty("title", uniqueTitle);
   // expect(jsonGet).toHaveProperty("price", 200);
@@ -205,6 +225,8 @@ test("delete product - should be successful", async ({ request }) => {
   );
 
   expect(responseGetDeletedProduct.status()).toBe(404);
+  const headers = responseDeleted.headers();
+  expect(headers["access-control-allow-origin"]).toBe("*");
 });
 
 //Get Products related by id
@@ -240,6 +262,10 @@ test("Get products related by id - should be successful", async ({
   expect(relatedJson.length).toBeGreaterThan(0);
   expect(relatedJson.every((product) => product.id !== productId)).toBeTruthy;
   expect(relatedProduct.status()).toBe(200);
+  const headers = relatedProduct.headers();
+  expect(headers["access-control-allow-origin"]).toBe("*");
+  expect(headers["content-type"]).toContain("application/json");
+  expect(headers).toHaveProperty("date");
 });
 
 //Get Products related by slug
@@ -275,4 +301,28 @@ test("Get products related by slug - should be successful", async ({
   expect(relatedJson.every((product) => product.slug !== productSlug))
     .toBeTruthy;
   expect(relatedProduct.status()).toBe(200);
+  const headers = relatedProduct.headers();
+  expect(headers["access-control-allow-origin"]).toBe("*");
+  expect(headers["content-type"]).toContain("application/json");
+  expect(headers).toHaveProperty("date");
+});
+
+//Create product without title
+test("create product without title - it should not be successful", async ({
+  request,
+}) => {
+  //Arrange
+  //Act
+  const response = await request.post("/api/v1/products/", {
+    data: {
+      price: 10,
+      description: "A description",
+      categoryId: 1,
+      images: ["https://placehold.co/600x400"],
+    },
+    failOnStatusCode: false,
+  });
+
+  //Assert
+  expect(response.status()).toBe(400);
 });
